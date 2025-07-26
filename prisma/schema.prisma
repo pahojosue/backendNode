@@ -13,7 +13,7 @@ model utilisateur {
   nomUtilisateur  String  @unique @db.VarChar(45)
   email           String  @unique @db.VarChar(60)
   motDePasse      String  @db.VarChar(55)
-  role            Json
+  role            Json    
   contact         String  @unique @db.VarChar(45)
   addresse        String  @db.VarChar(100)
   ville           String  @db.VarChar(45)
@@ -36,7 +36,7 @@ model produit {
   id             String  @id
   nom            String  @db.VarChar(35)
   description    String  @db.VarChar(255)
-  prix           Decimal?
+  prix           Float
   statut         Json?
   utilisateur    utilisateur @relation(fields: [utilisateur_id], references: [id])
   utilisateur_id String
