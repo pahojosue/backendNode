@@ -2,6 +2,9 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import userRouter from './src/routes/userRouter.js';
+import categoryRouter from './src/routes/categoryRouter.js';
+import productRouter from './src/routes/productRouter.js';
 
 const app = express();
 
@@ -32,9 +35,9 @@ app.use(cors(corsOptions));
  *  route
  */
 
-
-
-
+app.use('/api/users', userRouter);
+app.use('/api/category', categoryRouter);
+app.use('/api/product', productRouter);
 
 
 /**
