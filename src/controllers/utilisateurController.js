@@ -1,20 +1,11 @@
 import {prisma} from '../../config/config.js';
 import bcrypt from 'bcrypt';
 import { numberRoundsHashing } from '../utils/utils.js';
+import { sendVerificationMail } from '../services/sendEmail.js';
 
 export const createUser = async (req, res) => {
     try {
         const { name, userName, email, password, role, contact, address, city } = req.body;
-
-        //Check if any of the required fields is empty
-        if(name === undefined || userName === undefined || email === undefined || password === undefined || contact === undefined || address === undefined || city === undefined) {
-            return res.status(400).json({Error: "All the fields are required."});
-        }
-
-        //Check if email matches a real email
-        if(!email.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)) {
-            return res.status(400).json({Error: "Enter a valid email address"});
-        }
 
         //Check if email is already inUse
         const existingUserEmail = await prisma.utilisateur.findUnique({
@@ -51,6 +42,8 @@ export const createUser = async (req, res) => {
                 ville: city,
             },
         });
+
+        sendVerificationMail(email);
 
         return res.status(200).json({message: "New user successfully created"});
     } catch (err) {
