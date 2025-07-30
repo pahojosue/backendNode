@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import cookieParser from 'cookie-parser';
 import userRouter from './src/routes/userRouter.js';
 import categoryRouter from './src/routes/categoryRouter.js';
 import productRouter from './src/routes/productRouter.js';
@@ -13,6 +14,7 @@ const app = express();
  */
 app.use(express.json()); // Body parser pour JSON
 app.use(morgan('dev')); // Logger HTTP
+app.use(cookieParser()); // To add the token to the user's cookie
 
 // Configuration CORS (option sécurisée, modifiable par domaine)
 const corsOptions = {

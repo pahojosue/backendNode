@@ -12,7 +12,7 @@ model utilisateur {
   nom               String    @db.VarChar(50)
   nomUtilisateur    String    @unique @db.VarChar(45)
   email             String    @unique @db.VarChar(60)
-  password          String    @db.VarChar(55)
+  password          String    
   role              Json      @default("[\"ROLE_USER\"]")
   contact           String    @db.VarChar(45)
   addresse          String    @db.VarChar(100)

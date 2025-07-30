@@ -1,7 +1,8 @@
 import {prisma} from '../../config/config.js';
-import bcrypt from 'bcrypt';
 import { numberRoundsHashing } from '../utils/utils.js';
 import { sendVerificationMail } from '../services/sendEmail.js';
+import { generateToken } from '../services/generateToken.js';
+import bcrypt from 'bcryptjs';
 
 export const createUser = async (req, res) => {
     try {
@@ -30,7 +31,7 @@ export const createUser = async (req, res) => {
         //Hash the password
         const hashedPassword = await bcrypt.hash(password, numberRoundsHashing);
 
-        await prisma.utilisateur.create({
+        const newUser = await prisma.utilisateur.create({
             data: {
                 nom: name,
                 nomUtilisateur: userName,
@@ -43,7 +44,17 @@ export const createUser = async (req, res) => {
             },
         });
 
-        sendVerificationMail(email);
+        const token = generateToken(newUser.id);
+        await prisma.utilisateur.update({
+            where: {
+                id: newUser.id,
+            },
+            data: {
+                verification_code: token,
+            },
+        });
+
+        await sendVerificationMail(email, token);
 
         return res.status(200).json({message: "New user successfully created"});
     } catch (err) {

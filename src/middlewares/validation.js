@@ -24,3 +24,19 @@ export const registerValidation = (req, res, next) => {
     req.body = result.value;
     return next();
 };
+
+export const loginValidation = (req, res, next) => {
+    const data = req.body;
+    const schema = Joi.object({
+        email: Joi.string().email().required().messages({"any.required": "The email is required", "string.empty": "The email cannot be empty", "string.email": "Please enter a valid email"}),
+        password: Joi.string().required().messages({"any.required": "The password is required", "string.empty": "The password cannot be empty"}),
+    });
+
+    const result = schema.validate(data);
+    if(result.error) {
+        return res.status(400).json({Error: result.error.details[0].message});
+    }
+
+    req.body = result.value;
+    return next();
+};
