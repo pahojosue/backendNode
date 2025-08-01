@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken';
+import { refreshToken } from '../services/tokenManager.js';
 
 
-export const verifyLogin = (req, res, next) => {
+export const verifyLogin = async (req, res, next) => {
     try {
         const authHeader = req.headers['authorization'];
         const token = authHeader && authHeader.split(' ')[1];
@@ -11,10 +12,16 @@ export const verifyLogin = (req, res, next) => {
         }
 
         const verifiedUser = jwt.verify(token, process.env.JWT_TOKEN_SECRET);
-        req.user = verifiedUser;
+        req.tokens = verifiedUser;
         next();
     } catch (err) {
-        res.clearCookie("token");
-        res.status(400).json({ Error: err.message });
+        if(err.message === "jwt expired") {
+            const tokens = await refreshToken(req);
+            req.tokens = tokens;
+            next();
+        }
+        else {
+            res.status(400).json({ Error: err.message });
+        }
     }
 };

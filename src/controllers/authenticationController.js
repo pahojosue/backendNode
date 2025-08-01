@@ -1,6 +1,6 @@
 import { prisma } from "../../config/config.js";
 import bcrypt from "bcryptjs";
-import { generateTokenEmail } from "../services/generateToken.js";
+import { verifyToken, generateTokenEmail, generateRefreshTokenEmail } from "../services/tokenManager.js";
 
 
 export const loginUser = async (req, res) => {
@@ -30,15 +30,42 @@ export const loginUser = async (req, res) => {
         }
 
         const token = generateTokenEmail(userExists.id, userExists.email);
+        const refreshToken = generateRefreshTokenEmail(userExists.id, userExists.email);
         
-        //send token to cookie
-        // res.cookie("token", token, {
+        //send refreshToken to cookie
+        // res.cookie("refreshToken", refreshToken, {
         //     httpOnly: true,
         //     secure: false, //This will allow the token over http, put "true" in production
         //     sameSite: 'None', //This will allow cookies to be accesed if request comes from a different site or a different server
         // });
 
-        return res.status(200).json({ message: "You are now logged In", token: token });
+        return res.status(200).json({ message: "You are now logged In", token: token, refreshToken: refreshToken });
+    } catch (err) {
+        res.status(500).json({ Error: err.message });
+    }
+};
+
+export const verifyUser = async (req, res, next) => {
+    try {
+        const givenToken = req.params.token;
+
+        const verifiedId = verifyToken(givenToken);
+
+        if (!verifiedId) {
+            return res.status(401).json({ Error: "Tokens doesn't match" });
+        }
+
+        await prisma.utilisateur.update({
+            where: {
+                id: verifiedId.userId,
+            },
+            data: {
+                verification_code: "",
+                updated_at: new Date(),
+            },
+        });
+
+        return next();
     } catch (err) {
         res.status(500).json({ Error: err.message });
     }

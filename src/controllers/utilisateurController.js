@@ -1,7 +1,7 @@
 import {prisma} from '../../config/config.js';
 import { numberRoundsHashing } from '../utils/utils.js';
 import { sendVerificationMail } from '../services/sendEmail.js';
-import { generateToken } from '../services/generateToken.js';
+import { generateToken } from '../services/tokenManager.js';
 import bcrypt from 'bcryptjs';
 
 export const createUser = async (req, res) => {
