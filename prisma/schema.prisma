@@ -39,7 +39,7 @@ model categorie {
 }
 
 model produit {
-  id             String      @id  @default(cuid())
+  id             String      @id @default(cuid())
   nom            String      @db.VarChar(35)
   description    String      @db.VarChar(255)
   prix           Decimal?
